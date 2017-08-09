@@ -12,6 +12,33 @@ class Api::V1::AccountsController < ApplicationController
       transactions: @account.transactions }
   end
 
+
+  def show
+    @accounts = current_user.accounts
+    #setting up empty data object to send back in the right format
+    data = {:accounts => []}
+    #iterating through and constructing the object here
+    data.each do |key, value|
+      @accounts.each do |account|
+        value.push({:account => account, :holdings => []})
+      end
+    end
+
+    #doing one more iteration and filling in the holdings and transactions
+    data.each do |key, value|
+      value.each do |object|
+        if object.keys[1] === :holdings
+          @accounts.each do |account|
+            account.holdings.each do |holding|
+              object.values[1].push({:holding => holding, :transactions => holding.transactions})
+          end
+        end
+      end
+    end
+   end
+    render json: data
+  end
+
   private
 
   def account_params

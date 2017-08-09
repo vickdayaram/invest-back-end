@@ -1,3 +1,5 @@
 class AccountSerializer < ActiveModel::Serializer
-  attributes :id, :account_number, :account_type
+  belongs_to :user
+  has_many :holdings
+  attributes :account_number, :account_type
 end

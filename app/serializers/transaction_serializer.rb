@@ -1,3 +1,3 @@
 class TransactionSerializer < ActiveModel::Serializer
-  attributes :id, :holding_id, :buy, :sell
+  attributes :holding_id, :buy, :sell
 end

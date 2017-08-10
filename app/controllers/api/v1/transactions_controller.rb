@@ -45,14 +45,22 @@ class Api::V1::TransactionsController < ApplicationController
       @account.holdings[0].transactions << money_market_sell
       @account.holdings[0].shares = @account.holdings[0].shares - amount.to_i
       @account.holdings[0].save
+      investment_to_be_transacted[0].transactions << transaction[0]
+      investment_to_be_transacted[0].shares = investment_to_be_transacted[0].shares + (amount.to_i/last_price.to_i)
+      @account.holdings << investment_to_be_transacted[0]
+      @account.save
     else
-    transaction.push(Transaction.create(sell: true, execution_price: last_price))
+      transaction.push(Transaction.create(sell: true, execution_price: last_price))
+      money_market_buy = Transaction.create(buy: true, execution_price: 1)
+      @account.holdings[0].transactions << money_market_buy
+      @account.holdings[0].shares = @account.holdings[0].shares + amount.to_i
+      @account.holdings[0].save
+      investment_to_be_transacted[0].transactions << transaction[0]
+      investment_to_be_transacted[0].shares = investment_to_be_transacted[0].shares - (amount.to_i/last_price.to_i)
+      @account.holdings << investment_to_be_transacted[0]
+      @account.save
     end
-
-    investment_to_be_transacted[0].transactions << transaction[0]
-    investment_to_be_transacted[0].shares = investment_to_be_transacted[0].shares + (amount.to_i/last_price.to_i)
-    @account.holdings << investment_to_be_transacted[0]
-    @account.save
+    
     render json: @account.holdings
   end
 

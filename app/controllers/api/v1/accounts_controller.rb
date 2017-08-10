@@ -36,6 +36,7 @@ class Api::V1::AccountsController < ApplicationController
         end
       end
     end
+    data[:username] = current_user.username
     render json: data
   end
 

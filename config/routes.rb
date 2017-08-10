@@ -3,8 +3,12 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      get '/users', to: 'users#index'
-      post '/users', to: 'users#create'
+      post '/signup', to: 'users#create'
+      post '/login', to: 'auth#create'
+      post '/newaccount', to: 'accounts#create'
+      get '/getaccounts', to: 'accounts#show'
+      get '/me', to: 'users#show'
+      get '/holdings', to: 'holdings#show'
     end
   end
 end

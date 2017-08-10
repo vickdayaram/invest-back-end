@@ -2,6 +2,7 @@ class Api::V1::AccountsController < ApplicationController
 
   def create
     @account = Account.new(account_type: account_params["type"])
+    @account.account_number = @account.generate_account_number
     money_market = Holding.create(name: "Money Marketfund", symbol: "MM", shares: account_params["deposit"])
     money_market.transactions << Transaction.create(buy: true, execution_price: 1)
     @account.holdings << money_market
@@ -36,6 +37,7 @@ class Api::V1::AccountsController < ApplicationController
         end
       end
     end
+  
     data[:username] = current_user.username
     render json: data
   end

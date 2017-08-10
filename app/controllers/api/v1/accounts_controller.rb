@@ -27,15 +27,15 @@ class Api::V1::AccountsController < ApplicationController
     #doing one more iteration and filling in the holdings and transactions
     data.each do |key, value|
       value.each do |object|
-        if object.keys[1] === :holdings
           @accounts.each do |account|
-            account.holdings.each do |holding|
-              object.values[1].push({:holding => holding, :transactions => holding.transactions})
+            if object[:account].id === account.id
+              account.holdings.each do |holding|
+                object.values[1].push({:holding => holding, :transactions => holding.transactions})
+            end
           end
         end
       end
     end
-   end
     render json: data
   end
 

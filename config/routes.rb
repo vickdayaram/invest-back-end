@@ -9,6 +9,7 @@ Rails.application.routes.draw do
       get '/getaccounts', to: 'accounts#show'
       get '/me', to: 'users#show'
       get '/holdings', to: 'holdings#show'
+      post '/transact', to: 'transactions#create'
     end
   end
 end

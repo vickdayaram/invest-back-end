@@ -5,10 +5,9 @@ class Api::V1::TransactionsController < ApplicationController
     account_number = transaction_params["account"].split(" ")[3]
     investment = transaction_params["investment"]
     transaction_type = transaction_params["transaction"]
-    amount = transaction_params["amount"]
-
+    shares = transaction_params["shares"]
     #locate account
-    @user = current_user 
+    @user = current_user
     @account = @user.accounts.find_by(account_number: account_number)
 
     #retrieve price for appropriate investment
@@ -19,7 +18,7 @@ class Api::V1::TransactionsController < ApplicationController
     investment_to_be_transacted = @account.find_or_create_holding(investment)
 
     #process the transaction
-    @account.process_transaction(transaction_type, execution_price, amount, investment_to_be_transacted)
+    @account.process_transaction(transaction_type, execution_price, shares, investment_to_be_transacted)
 
     render json: @account.holdings
   end
@@ -27,6 +26,6 @@ class Api::V1::TransactionsController < ApplicationController
   private
 
   def transaction_params
-    params.permit(:account, :transaction, :investment, :amount)
+    params.permit(:account, :transaction, :investment, :shares)
   end
 end

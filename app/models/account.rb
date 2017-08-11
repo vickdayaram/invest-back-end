@@ -17,28 +17,30 @@ class Account < ApplicationRecord
       return Holding.create(symbol: investment)
   end
 
-  def process_transaction(transaction_type, last_price, amount, investment_to_be_transacted)
+  def process_transaction(transaction_type, last_price, shares, investment_to_be_transacted)
     if transaction_type === "BUY"
-      self.process_buy(last_price, amount, investment_to_be_transacted)
+      self.process_buy(last_price, shares, investment_to_be_transacted)
     else
-      self.process_sell(last_price, amount, investment_to_be_transacted)
+      self.process_sell(last_price, shares, investment_to_be_transacted)
     end
   end
 
-  def process_buy(last_price, amount, investment_to_be_transacted)
+  def process_buy(last_price, shares, investment_to_be_transacted)
       transaction_buy = (Transaction.create(buy: true, execution_price: last_price))
+      amount = (shares.to_i * last_price.to_i)
       self.sell_money_market(amount)
       investment_to_be_transacted.transactions << transaction_buy
-      investment_to_be_transacted.shares = investment_to_be_transacted.shares + (amount.to_i/last_price.to_i)
+      investment_to_be_transacted.shares = investment_to_be_transacted.shares + shares.to_i
       self.holdings << investment_to_be_transacted
       self.save
   end
 
-  def process_sell(last_price, amount, investment_to_be_transacted)
+  def process_sell(last_price, shares, investment_to_be_transacted)
     transaction_sell = (Transaction.create(sell: true, execution_price: last_price))
+    amount = (shares.to_i * last_price.to_i)
     self.buy_money_market(amount)
     investment_to_be_transacted.transactions << transaction_sell
-    investment_to_be_transacted.shares = investment_to_be_transacted.shares - (amount.to_i/last_price.to_i)
+    investment_to_be_transacted.shares = investment_to_be_transacted.shares - shares.to_i
     self.holdings << investment_to_be_transacted
     self.save
   end
@@ -48,7 +50,7 @@ class Account < ApplicationRecord
     self.holdings.each do |holding|
       if holding.symbol === "MM"
         holding.transactions << money_market_sell
-        holding.shares = holding.shares - amount.to_i
+        holding.shares = holding.shares - amount
         holding.save
       end
     end
@@ -59,7 +61,7 @@ class Account < ApplicationRecord
     self.holdings.each do |holding|
       if holding.symbol === "MM"
         holding.transactions << money_market_buy
-        holding.shares = holding.shares + amount.to_i
+        holding.shares = holding.shares + amount
         holding.save
       end
     end

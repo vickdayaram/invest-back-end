@@ -1,9 +1,4 @@
-require 'rest_client'
-require 'json'
-
 class Api::V1::TransactionsController < ApplicationController
-
-  @@apiKey = "NKIEQH9ZHQ1ZFJVL"
 
   def create
     #break down request
@@ -13,7 +8,8 @@ class Api::V1::TransactionsController < ApplicationController
     amount = transaction_params["amount"]
 
     #locate account
-    @account = current_user.accounts.find_by(account_number: account_number)
+    @user = current_user 
+    @account = @user.accounts.find_by(account_number: account_number)
 
     #retrieve price for appropriate investment
     @holding = Holding.new

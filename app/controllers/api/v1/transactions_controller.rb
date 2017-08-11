@@ -42,9 +42,13 @@ class Api::V1::TransactionsController < ApplicationController
     if transaction_type === "BUY"
       transaction.push(Transaction.create(buy: true, execution_price: last_price))
       money_market_sell = Transaction.create(sell: true, execution_price: 1)
-      @account.holdings[0].transactions << money_market_sell
-      @account.holdings[0].shares = @account.holdings[0].shares - amount.to_i
-      @account.holdings[0].save
+      @account.holdings.each do |holding|
+        if holding.symbol === "MM"
+          holding.transactions << money_market_sell
+          holding.shares = holding.shares - amount.to_i
+          holding.save
+        end
+      end
       investment_to_be_transacted[0].transactions << transaction[0]
       investment_to_be_transacted[0].shares = investment_to_be_transacted[0].shares + (amount.to_i/last_price.to_i)
       @account.holdings << investment_to_be_transacted[0]
@@ -52,15 +56,19 @@ class Api::V1::TransactionsController < ApplicationController
     else
       transaction.push(Transaction.create(sell: true, execution_price: last_price))
       money_market_buy = Transaction.create(buy: true, execution_price: 1)
-      @account.holdings[0].transactions << money_market_buy
-      @account.holdings[0].shares = @account.holdings[0].shares + amount.to_i
-      @account.holdings[0].save
+      @account.holdings.each do |holding|
+        if holding.symbol === "MM"
+          holding.transactions << money_market_buy
+          holding.shares = holding.shares + amount.to_i
+          holding.save
+        end
+      end
       investment_to_be_transacted[0].transactions << transaction[0]
       investment_to_be_transacted[0].shares = investment_to_be_transacted[0].shares - (amount.to_i/last_price.to_i)
       @account.holdings << investment_to_be_transacted[0]
       @account.save
     end
-    
+
     render json: @account.holdings
   end
 

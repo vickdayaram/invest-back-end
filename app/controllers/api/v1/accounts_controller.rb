@@ -30,14 +30,15 @@ class Api::V1::AccountsController < ApplicationController
       value.each do |object|
           @accounts.each do |account|
             if object[:account].id === account.id
-              account.holdings.each do |holding|
-                object.values[1].push({:holding => holding, :transactions => holding.transactions})
+              sorted = account.holdings.sort_by{ |holding| holding.id}
+                sorted.each do |holding|
+                  object.values[1].push({:holding => holding, :transactions => holding.transactions})
             end
           end
         end
       end
     end
-  
+
     data[:username] = current_user.username
     render json: data
   end

@@ -26,13 +26,13 @@ class Account < ApplicationRecord
   end
 
   def process_buy(last_price, shares, investment_to_be_transacted)
-      transaction_buy = (Transaction.create(buy: true, execution_price: last_price))
-      amount = (shares.to_i * last_price.to_i)
-      self.sell_money_market(amount)
-      investment_to_be_transacted.transactions << transaction_buy
-      investment_to_be_transacted.shares = investment_to_be_transacted.shares + shares.to_i
-      self.holdings << investment_to_be_transacted
-      self.save
+    transaction_buy = (Transaction.create(buy: true, execution_price: last_price))
+    amount = (shares.to_i * last_price.to_i)
+    self.sell_money_market(amount)
+    investment_to_be_transacted.transactions << transaction_buy
+    investment_to_be_transacted.shares = investment_to_be_transacted.shares + shares.to_i
+    self.holdings << investment_to_be_transacted
+    self.save
   end
 
   def process_sell(last_price, shares, investment_to_be_transacted)

@@ -31,7 +31,7 @@ class User < ApplicationRecord
       end
     end
     total = '%.2f' % [(total * 100).round / 100.0]
-    return [total, holdings_by_dollars]
+    return {portfolio_total: total, username: self.username, allocation: holdings_by_dollars}
   end
 
   def format_json
@@ -57,9 +57,6 @@ class User < ApplicationRecord
       end
     end
 
-    data[:portfolio_allocation] = self.portfolio_total_and_allocation[1]
-    data[:portfolio_total] = self.portfolio_total_and_allocation[0]
-    data[:username] = self.username
     return data
   end
 

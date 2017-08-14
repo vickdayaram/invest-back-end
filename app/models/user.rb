@@ -4,6 +4,8 @@ class User < ApplicationRecord
   has_many :holdings, through: :accounts
   has_many :transactions, through: :holdings
 
+  attr_accessor :portfolio_allocation
+
   def portfolio_holdings
     holdings = []
     self.holdings.each do |holding|
@@ -13,22 +15,24 @@ class User < ApplicationRecord
     sum_of_holdings
   end
 
-  def portfolio_total
+  def portfolio_total_and_allocation
     @holding = Holding.new
     holdings = self.portfolio_holdings
+    holdings_by_dollars = []
     total = 0
     holdings.each do |key, value|
       if key === "MM"
+        holdings_by_dollars.push({key => (1 * value.to_f).to_f})
         total += (1 * value.to_f).to_f
       else
-        total += (@holding.get_price(key).to_f * value.to_f)
+        price = @holding.get_price(key).to_f
+        holdings_by_dollars.push({key => (price * value.to_f).to_f})
+        total += (price * value.to_f)
       end
     end
     total = '%.2f' % [(total * 100).round / 100.0]
-    total
+    return [total, holdings_by_dollars]
   end
-
-
 
   def format_json
     data = {:accounts => []}
@@ -53,7 +57,8 @@ class User < ApplicationRecord
       end
     end
 
-    data[:portfolio_total] = self.portfolio_total
+    data[:portfolio_allocation] = self.portfolio_total_and_allocation[1]
+    data[:portfolio_total] = self.portfolio_total_and_allocation[0]
     data[:username] = self.username
     return data
   end

@@ -4,6 +4,32 @@ class User < ApplicationRecord
   has_many :holdings, through: :accounts
   has_many :transactions, through: :holdings
 
+  def portfolio_holdings
+    holdings = []
+    self.holdings.each do |holding|
+      holdings.push({holding.symbol => holding.shares})
+    end
+    sum_of_holdings = holdings.inject{|a,b| a.merge(b){|_,x,y| x + y}}
+    sum_of_holdings
+  end
+
+  def portfolio_total
+    @holding = Holding.new
+    holdings = self.portfolio_holdings
+    total = 0
+    holdings.each do |key, value|
+      if key === "MM"
+        total += (1 * value.to_f).to_f
+      else
+        total += (@holding.get_price(key).to_f * value.to_f)
+      end
+    end
+    total = '%.2f' % [(total * 100).round / 100.0]
+    total
+  end
+
+
+
   def format_json
     data = {:accounts => []}
     #iterating through and constructing the object here
@@ -27,6 +53,7 @@ class User < ApplicationRecord
       end
     end
 
+    data[:portfolio_total] = self.portfolio_total
     data[:username] = self.username
     return data
   end

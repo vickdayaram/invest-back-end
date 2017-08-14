@@ -2,14 +2,13 @@ class Api::V1::TransactionsController < ApplicationController
 
   def create
     #break down request
-    account_number = transaction_params["account"].split(" ")[3]
+    account_id = transaction_params["account_id"]
     investment = transaction_params["investment"]
     transaction_type = transaction_params["transaction"]
     shares = transaction_params["shares"]
     #locate account
     @user = current_user
-    @account = @user.accounts.find_by(account_number: account_number)
-
+    @account = @user.accounts.find_by(id: account_id)
     #retrieve price for appropriate investment
     @holding = Holding.new
     execution_price = @holding.get_price(investment)
@@ -26,6 +25,6 @@ class Api::V1::TransactionsController < ApplicationController
   private
 
   def transaction_params
-    params.permit(:account, :transaction, :investment, :shares)
+    params.permit(:transaction, :investment, :shares, :account_id)
   end
 end

@@ -65,8 +65,31 @@ class User < ApplicationRecord
     account.account_number = account.generate_account_number
     money_market = Holding.create(name: "Money Marketfund", symbol: "MM", shares: deposit)
     money_market.transactions << Transaction.create(buy: true, execution_price: 1)
+    money_market.save
     account.holdings << money_market
+    account.save
     self.accounts << account
     return self
+  end
+
+  def get_transactions
+    transactions_by_account = {}
+    self.accounts.each do |account|
+      key = account.account_type + " " + account.account_number.to_s
+      transactions_by_account[key] = []
+    end
+    self.accounts.each do |account|
+      account.transactions.each do |transaction|
+        key = account.account_type + " " + account.account_number.to_s
+        transactions_by_account[key].push(
+        {holding: transaction.holding.symbol,
+         buy: transaction.buy,
+         sell: transaction.sell,
+         price: transaction.execution_price,
+         date: transaction.created_at,
+         shares: transaction.holding.shares})
+      end
+    end
+    return transactions_by_account
   end
 end

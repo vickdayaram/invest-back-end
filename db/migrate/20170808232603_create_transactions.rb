@@ -2,10 +2,10 @@ class CreateTransactions < ActiveRecord::Migration[5.1]
   def change
     create_table :transactions do |t|
       t.references :holding
-      t.integer :shares_executed
+      t.decimal :shares_executed
       t.boolean :buy, default: false
       t.boolean :sell, default: false
-      t.integer :execution_price
+      t.decimal :execution_price
       t.timestamps
     end
   end

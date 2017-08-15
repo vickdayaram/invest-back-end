@@ -61,13 +61,11 @@ class User < ApplicationRecord
   end
 
   def create_account(type, deposit)
-    account = Account.new(account_type: type)
+    account = Account.create(account_type: type)
     account.account_number = account.generate_account_number
     money_market = Holding.create(name: "Money Marketfund", symbol: "MM", shares: deposit)
-    money_market.transactions << Transaction.create(buy: true, execution_price: 1)
-    money_market.save
+    money_market.transactions << Transaction.create(buy: true, execution_price: 1, shares_executed: deposit)
     account.holdings << money_market
-    account.save
     self.accounts << account
     return self
   end
@@ -87,7 +85,7 @@ class User < ApplicationRecord
          sell: transaction.sell,
          price: transaction.execution_price,
          date: transaction.created_at,
-         shares: transaction.holding.shares})
+         shares: transaction.shares_executed})
       end
     end
     return transactions_by_account

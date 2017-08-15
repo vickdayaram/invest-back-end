@@ -26,7 +26,7 @@ class Account < ApplicationRecord
   end
 
   def process_buy(last_price, shares, investment_to_be_transacted)
-    transaction_buy = (Transaction.create(buy: true, execution_price: last_price.to_f.round(2)))
+    transaction_buy = (Transaction.create(buy: true, execution_price: last_price.to_f.round(2), shares_executed: shares))
     amount = (shares.to_i * last_price.to_f.round(2)).to_f.round(2)
     self.sell_money_market(amount)
     investment_to_be_transacted.transactions << transaction_buy
@@ -36,7 +36,7 @@ class Account < ApplicationRecord
   end
 
   def process_sell(last_price, shares, investment_to_be_transacted)
-    transaction_sell = (Transaction.create(sell: true, execution_price: last_price.to_f.round(2)))
+    transaction_sell = (Transaction.create(sell: true, execution_price: last_price.to_f.round(2), shares_executed: shares))
     amount = (shares.to_i * last_price.to_f.round(2)).to_f.round(2)
     self.buy_money_market(amount)
     investment_to_be_transacted.transactions << transaction_sell
@@ -46,7 +46,7 @@ class Account < ApplicationRecord
   end
 
   def sell_money_market(amount)
-    money_market_sell = Transaction.create(sell: true, execution_price: 1)
+    money_market_sell = Transaction.create(sell: true, execution_price: 1, shares_executed: amount)
     self.holdings.each do |holding|
       if holding.symbol === "MM"
         holding.transactions << money_market_sell
@@ -57,7 +57,7 @@ class Account < ApplicationRecord
   end
 
   def buy_money_market(amount)
-    money_market_buy = Transaction.create(buy: true, execution_price: 1)
+    money_market_buy = Transaction.create(buy: true, execution_price: 1, shares_executed: amount)
     self.holdings.each do |holding|
       if holding.symbol === "MM"
         holding.transactions << money_market_buy

@@ -46,6 +46,7 @@ ActiveRecord::Schema.define(version: 20170808232647) do
 
   create_table "transactions", force: :cascade do |t|
     t.bigint "holding_id"
+    t.integer "shares_executed"
     t.boolean "buy", default: false
     t.boolean "sell", default: false
     t.integer "execution_price"

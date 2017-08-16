@@ -73,12 +73,12 @@ class User < ApplicationRecord
   def get_transactions
     transactions_by_account = {}
     self.accounts.each do |account|
-      key = account.account_type + " " + account.account_number.to_s
+      key = account.account_type + " " + account.account_number.to_s + "-" + account.id.to_s
       transactions_by_account[key] = []
     end
     self.accounts.each do |account|
       account.transactions.each do |transaction|
-        key = account.account_type + " " + account.account_number.to_s
+        key = account.account_type + " " + account.account_number.to_s + "-" + account.id.to_s
         transactions_by_account[key].push(
         {holding: transaction.holding.symbol,
          buy: transaction.buy,

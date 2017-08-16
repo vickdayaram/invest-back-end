@@ -22,6 +22,12 @@ class Api::V1::TransactionsController < ApplicationController
     render json: @account.holdings
   end
 
+  def show
+    @user = current_user
+    @transactions = @user.get_transactions
+    render json: @transactions
+  end
+
   private
 
   def transaction_params

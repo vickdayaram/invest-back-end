@@ -84,7 +84,7 @@ class User < ApplicationRecord
          buy: transaction.buy,
          sell: transaction.sell,
          price: transaction.execution_price,
-         date: transaction.created_at,
+         date: transaction.created_at.strftime("%d %b. %Y  %H:%M"),
          shares: transaction.shares_executed})
       end
     end

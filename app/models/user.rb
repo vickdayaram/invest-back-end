@@ -1,5 +1,8 @@
 class User < ApplicationRecord
   has_secure_password
+  validates :username, uniqueness: true, length: {:within => 6..12}
+  validates :username, presence: true
+  validates :password, presence: true, length: {:within => 6..10}
   has_many :accounts
   has_many :holdings, through: :accounts
   has_many :transactions, through: :holdings

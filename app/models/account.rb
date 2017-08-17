@@ -8,13 +8,28 @@ class Account < ApplicationRecord
     @@account_numbers.pop
   end
 
+  def get_holding_name(symbol)
+    name = ""
+    if symbol === "VTI"
+      name = "Vanguard Total Stock Market ETF"
+    elsif symbol === "VXUS"
+      name = "Vanguard Total International Stock Market ETF"
+    elsif symbol === "BND"
+      name = "Vanguard Total Bond Market ETF"
+    elsif symbol === "BNDX"
+      name = "Vanguard Total International Bond Market ETF"
+    end
+    name
+  end
+
   def find_or_create_holding(investment)
     self.holdings.each do |holding|
       if holding.symbol === investment
         return holding
       end
     end
-      return Holding.create(symbol: investment)
+      name = self.get_holding_name(investment)
+      return Holding.create(symbol: investment, name: name)
   end
 
   def process_transaction(transaction_type, last_price, shares, investment_to_be_transacted)

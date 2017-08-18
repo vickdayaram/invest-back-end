@@ -21,7 +21,7 @@ class Api::V1::AuthController < ApplicationController
     else
       # otherwise, render back some error response
       render json: {
-        error: 'Username or password incorrect'
+        errors: 'Username or password incorrect'
       }, status: 422
     end
   end

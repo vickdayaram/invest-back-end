@@ -22,13 +22,12 @@ class Account < ApplicationRecord
     name
   end
 
-  def find_or_create_holding(investment)
+  def find_or_create_holding(investment, name)
     self.holdings.each do |holding|
       if holding.symbol === investment
         return holding
       end
     end
-      name = self.get_holding_name(investment)
       return Holding.create(symbol: investment, name: name)
   end
 

@@ -6,6 +6,7 @@ class Api::V1::TransactionsController < ApplicationController
     investment = transaction_params["investment"]
     transaction_type = transaction_params["transaction"]
     shares = transaction_params["shares"]
+    name = transaction_params["name"]
     #locate account
     @user = current_user
     @account = @user.accounts.find_by(id: account_id)
@@ -14,7 +15,7 @@ class Api::V1::TransactionsController < ApplicationController
     execution_price = @holding.get_price(investment)
 
     #locate the investment within the account or add it to the account
-    investment_to_be_transacted = @account.find_or_create_holding(investment)
+    investment_to_be_transacted = @account.find_or_create_holding(investment, name)
 
     #process the transaction
     @account.process_transaction(transaction_type, execution_price, shares, investment_to_be_transacted)
@@ -31,6 +32,6 @@ class Api::V1::TransactionsController < ApplicationController
   private
 
   def transaction_params
-    params.permit(:transaction, :investment, :shares, :account_id)
+    params.permit(:transaction, :investment, :shares, :account_id, :name)
   end
 end

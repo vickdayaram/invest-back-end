@@ -74,7 +74,7 @@ class User < ApplicationRecord
   end
 
   def create_managed_account(type, deposit, riskTolerance)
-    account = Account.create(account_type: "Managed " + type)
+    account = Account.create(account_type: "Managed "+ riskTolerance + " " + type)
     account.account_number = account.generate_account_number
     money_market = Holding.create(name: "Money Marketfund", symbol: "MM", shares: deposit)
     money_market.transactions << Transaction.create(buy: true, execution_price: 1, shares_executed: deposit)

@@ -128,16 +128,16 @@ class User < ApplicationRecord
     holding_prices.each do |holding_data|
       holding_data.each do |key, value|
       if key == "VTI"
-        shares = ((deposit.to_i * vti_percent)/value.to_i).round(2)
+        shares = ((deposit.to_i * vti_percent)/value.to_f).floor
         holding_prices_and_shares.push({key => {:price => value, :shares => shares}})
       elsif key == "VXUS"
-        shares = ((deposit.to_i * vxus_percent)/value.to_i).round(2)
+        shares = ((deposit.to_i * vxus_percent)/value.to_f).floor
         holding_prices_and_shares.push({key => {:price => value, :shares => shares}})
       elsif key == "BND"
-        shares = ((deposit.to_i * bnd_percent)/value.to_i).round(2)
+        shares = ((deposit.to_i * bnd_percent)/value.to_f).floor
         holding_prices_and_shares.push({key => {:price => value, :shares => shares}})
       elsif key == "BNDX"
-        shares = ((deposit.to_i * bndx_percent)/value.to_i).round(2)
+        shares = ((deposit.to_i * bndx_percent)/value.to_f).floor
         holding_prices_and_shares.push({key => {:price => value, :shares => shares}})
       end
      end

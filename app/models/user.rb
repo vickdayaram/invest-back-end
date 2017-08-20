@@ -1,7 +1,6 @@
 class User < ApplicationRecord
   has_secure_password
-  validates :username, uniqueness: true, length: {:within => 6..12}
-  validates :username, presence: true
+  validates :username, uniqueness: true, length: {:within => 4..12}, presence: true
   validates :password, presence: true, length: {:within => 6..10}
   has_many :accounts
   has_many :holdings, through: :accounts
@@ -154,10 +153,13 @@ class User < ApplicationRecord
     self.accounts.each do |account|
       account.transactions.each do |transaction|
         key = account.account_type + " " + account.account_number.to_s + "-" + account.id.to_s
+        type = "Buy"
+        if transaction.buy === false
+          type = "Sell"
+        end
         transactions_by_account[key].push(
         {holding: transaction.holding.symbol,
-         buy: transaction.buy,
-         sell: transaction.sell,
+         type: type,
          price: transaction.execution_price,
          date: transaction.created_at.strftime("%d %b. %Y  %H:%M"),
          shares: transaction.shares_executed})

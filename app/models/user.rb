@@ -1,7 +1,6 @@
 class User < ApplicationRecord
   has_secure_password
-  validates :username, uniqueness: true, length: {:within => 6..12}
-  validates :username, presence: true
+  validates :username, uniqueness: true, length: {:within => 4..12}, presence: true
   validates :password, presence: true, length: {:within => 6..10}
   has_many :accounts
   has_many :holdings, through: :accounts
@@ -73,6 +72,78 @@ class User < ApplicationRecord
     return self
   end
 
+  def create_managed_account(type, deposit, riskTolerance)
+    account = Account.create(account_type: "Managed "+ riskTolerance + " " + type)
+    account.account_number = account.generate_account_number
+    money_market = Holding.create(name: "Money Marketfund", symbol: "MM", shares: deposit)
+    money_market.transactions << Transaction.create(buy: true, execution_price: 1, shares_executed: deposit)
+    account.holdings << money_market
+    if riskTolerance === "Aggressive"
+      aggressive = [0.36, 0.24, 0.28, 0.12]
+      implementation_details = trade_details(deposit, aggressive)
+    elsif riskTolerance === "Moderate"
+      moderate = [0.30, 0.20, 0.35, 0.15]
+      implementation_details = trade_details(deposit, moderate)
+    elsif riskTolerance === "Conservative"
+      conservative = [0.24, 0.16, 0.42, 0.18]
+      implementation_details = trade_details(deposit, conservative)
+    end
+    implement_managed_portfolio(account, implementation_details)
+    account.save
+    self.accounts << account
+    return self
+  end
+
+  def implement_managed_portfolio(account, implementation_details)
+    implementation_details.each do |trade_data|
+      trade_data.each do |symbol, trade_details|
+          last_price = trade_details[:price]
+          shares = trade_details[:shares]
+          investment_name = account.get_holding_name(symbol)
+          investment_to_be_transacted = Holding.create(name: investment_name, symbol: symbol)
+          account.process_transaction("BUY", last_price, shares, investment_to_be_transacted)
+      end
+    end
+  end
+
+  def get_holding_prices
+    @holding = Holding.new
+    holdings = ["VTI", "VXUS", "BND", "BNDX"]
+    holding_prices = []
+    holdings.each do |holding|
+      price = @holding.get_price(holding)
+      holding_prices.push({holding => price})
+    end
+    return holding_prices
+  end
+
+  def trade_details(deposit, investment_percentages)
+    holding_prices = get_holding_prices
+    holding_prices_and_shares = []
+    vti_percent = investment_percentages[0]
+    vxus_percent = investment_percentages[1]
+    bnd_percent = investment_percentages[2]
+    bndx_percent = investment_percentages[3]
+    holding_prices.each do |holding_data|
+      holding_data.each do |key, value|
+      if key == "VTI"
+        shares = ((deposit.to_i * vti_percent)/value.to_f).floor
+        holding_prices_and_shares.push({key => {:price => value, :shares => shares}})
+      elsif key == "VXUS"
+        shares = ((deposit.to_i * vxus_percent)/value.to_f).floor
+        holding_prices_and_shares.push({key => {:price => value, :shares => shares}})
+      elsif key == "BND"
+        shares = ((deposit.to_i * bnd_percent)/value.to_f).floor
+        holding_prices_and_shares.push({key => {:price => value, :shares => shares}})
+      elsif key == "BNDX"
+        shares = ((deposit.to_i * bndx_percent)/value.to_f).floor
+        holding_prices_and_shares.push({key => {:price => value, :shares => shares}})
+      end
+     end
+    end
+    holding_prices_and_shares
+  end
+
   def get_transactions
     transactions_by_account = {}
     self.accounts.each do |account|
@@ -82,10 +153,13 @@ class User < ApplicationRecord
     self.accounts.each do |account|
       account.transactions.each do |transaction|
         key = account.account_type + " " + account.account_number.to_s + "-" + account.id.to_s
+        type = "Buy"
+        if transaction.buy === false
+          type = "Sell"
+        end
         transactions_by_account[key].push(
         {holding: transaction.holding.symbol,
-         buy: transaction.buy,
-         sell: transaction.sell,
+         type: type,
          price: transaction.execution_price,
          date: transaction.created_at.strftime("%d %b. %Y  %H:%M"),
          shares: transaction.shares_executed})

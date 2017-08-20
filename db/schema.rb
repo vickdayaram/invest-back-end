@@ -28,7 +28,7 @@ ActiveRecord::Schema.define(version: 20170808232647) do
     t.bigint "account_id"
     t.string "name"
     t.string "symbol"
-    t.integer "shares", default: 0
+    t.decimal "shares", default: "0.0"
     t.integer "current_price"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

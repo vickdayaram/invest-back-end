@@ -4,7 +4,7 @@ class CreateHoldings < ActiveRecord::Migration[5.1]
       t.references :account
       t.string :name
       t.string :symbol
-      t.integer :shares, default: 0
+      t.decimal :shares, default: 0.0
       t.integer :current_price
       t.timestamps
     end

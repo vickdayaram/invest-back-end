@@ -32,8 +32,17 @@ class User < ApplicationRecord
         total += (price * value.to_f)
       end
     end
+    total_contributions = get_total_portfolio_contributions
     total = '%.2f' % [(total * 100).round / 100.0]
-    return {portfolio_total: total, username: self.username, allocation: holdings_by_dollars}
+    return {portfolio_total: total, username: self.username, allocation: holdings_by_dollars, total_contributions: total_contributions}
+  end
+
+  def get_total_portfolio_contributions
+    total_contributions = 0
+    self.accounts.each do |account|
+      total_contributions += account.transactions.first.shares_executed.to_i
+    end
+    total_contributions
   end
 
   def format_json

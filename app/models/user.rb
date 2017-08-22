@@ -63,11 +63,11 @@ class User < ApplicationRecord
               sorted = account.holdings.sort_by{ |holding| holding.id}
                 sorted.each do |holding|
                   if holding.symbol === "MM"
-                    value = holding.shares.to_i
+                    value = holding.shares
                   else
                     symbol = holding.symbol
                     price = @holding.get_price(symbol).to_f
-                    shares = holding.shares.to_i
+                    shares = holding.shares
                     value = (price * shares).to_f
                   end
                   value = '%.2f' % [(value * 100).round / 100.0]

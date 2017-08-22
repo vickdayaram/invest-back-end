@@ -9,7 +9,7 @@ class Api::V1::AccountsController < ApplicationController
     new_account = @user.create_managed_account(type, deposit, risk_tolerance)
     else
     new_account = @user.create_account(type, deposit)
-    end 
+    end
     render json: new_account
   end
 
@@ -17,6 +17,12 @@ class Api::V1::AccountsController < ApplicationController
   def show
     @user = current_user
     data = @user.format_json
+    render json: data
+  end
+
+  def performance
+    @user = current_user
+    data = @user.get_account_performance
     render json: data
   end
 

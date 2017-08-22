@@ -45,15 +45,39 @@ class User < ApplicationRecord
     total_contributions
   end
 
-
-  def format_json
+  def make_json_data_object
     data = {:accounts => []}
-    #iterating through and constructing the object here
     data.each do |key, value|
       self.accounts.each do |account|
         value.push({:account => account, :holdings => []})
       end
     end
+    data
+  end
+
+
+  def format_json
+    data = make_json_data_object
+    @holding = Holding.new
+    #doing one more iteration and filling in the holdings and transactions
+    data.each do |key, value|
+      value.each do |object|
+          self.accounts.each do |account|
+            if object[:account].id === account.id
+              sorted = account.holdings.sort_by{ |holding| holding.id}
+                sorted.each do |holding|
+                  object.values[1].push({:holding => holding, :transactions => holding.transactions})
+            end
+          end
+        end
+      end
+    end
+
+    return data
+  end
+
+  def get_account_performance
+    data = make_json_data_object
     @holding = Holding.new
     #doing one more iteration and filling in the holdings and transactions
     data.each do |key, value|
@@ -77,7 +101,6 @@ class User < ApplicationRecord
         end
       end
     end
-
     return data
   end
 

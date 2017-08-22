@@ -37,6 +37,22 @@ class User < ApplicationRecord
     return {portfolio_total: total, username: self.username, allocation: holdings_by_dollars, total_contributions: total_contributions}
   end
 
+  #currently not using this method, tried to optimize but it did not work
+  def get_portfolio_symbols_and_prices
+    holdings = self.portfolio_holdings
+    @holding = Holding.new
+    symbol_and_price = []
+    holdings.each do |key, value|
+      if key === "MM"
+        symbol_and_price.push({key => 1})
+      else
+        price = @holding.get_price(key).to_f
+        symbol_and_price.push({key => price})
+      end
+    end
+    symbol_and_price
+  end
+
   def get_total_portfolio_contributions
     total_contributions = 0
     self.accounts.each do |account|
@@ -72,18 +88,28 @@ class User < ApplicationRecord
         end
       end
     end
-
     return data
+  end
+
+  #currently not using this method, tried to optimize but it did not work
+  def get_price_locally(symbol)
+    symbol_and_prices = get_portfolio_symbols_and_prices
+    symbol_and_prices.each do |symbol_and_price_object|
+      symbol_and_price_object.each do |symbolmatch, price|
+        if symbol === symbolmatch
+          return price
+        end
+      end
+    end
   end
 
   def get_account_performance
     data = make_json_data_object
     @holding = Holding.new
-    #doing one more iteration and filling in the holdings and transactions
     data.each do |key, value|
-      value.each do |object|
+      value.each do |account_object|
           self.accounts.each do |account|
-            if object[:account].id === account.id
+            if account_object[:account].id === account.id
               sorted = account.holdings.sort_by{ |holding| holding.id}
                 sorted.each do |holding|
                   if holding.symbol === "MM"
@@ -95,7 +121,7 @@ class User < ApplicationRecord
                     value = (price * shares).to_f
                   end
                   value = '%.2f' % [(value * 100).round / 100.0]
-                  object.values[1].push({:holding => holding, :transactions => holding.transactions, holding_by_dollars: value})
+                  account_object.values[1].push({:holding => holding, :transactions => holding.transactions, holding_by_dollars: value})
             end
           end
         end
@@ -103,6 +129,7 @@ class User < ApplicationRecord
     end
     return data
   end
+
 
   def create_account(type, deposit)
     account = Account.create(account_type: type)

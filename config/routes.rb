@@ -11,6 +11,7 @@ Rails.application.routes.draw do
       get '/holdings', to: 'holdings#show'
       post '/transact', to: 'transactions#create'
       get '/transactions', to: 'transactions#show'
+      get '/accountperformance', to: 'accounts#performance'
     end
   end
 end

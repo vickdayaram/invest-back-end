@@ -32,19 +32,33 @@ class User < ApplicationRecord
         total += (price * value.to_f)
       end
     end
+    total_contributions = get_total_portfolio_contributions
     total = '%.2f' % [(total * 100).round / 100.0]
-    return {portfolio_total: total, username: self.username, allocation: holdings_by_dollars}
+    return {portfolio_total: total, username: self.username, allocation: holdings_by_dollars, total_contributions: total_contributions}
   end
 
-  def format_json
+  def get_total_portfolio_contributions
+    total_contributions = 0
+    self.accounts.each do |account|
+      total_contributions += account.transactions.first.shares_executed.to_i
+    end
+    total_contributions
+  end
+
+  def make_json_data_object
     data = {:accounts => []}
-    #iterating through and constructing the object here
     data.each do |key, value|
       self.accounts.each do |account|
         value.push({:account => account, :holdings => []})
       end
     end
+    data
+  end
 
+
+  def format_json
+    data = make_json_data_object
+    @holding = Holding.new
     #doing one more iteration and filling in the holdings and transactions
     data.each do |key, value|
       value.each do |object|
@@ -59,6 +73,34 @@ class User < ApplicationRecord
       end
     end
 
+    return data
+  end
+
+  def get_account_performance
+    data = make_json_data_object
+    @holding = Holding.new
+    #doing one more iteration and filling in the holdings and transactions
+    data.each do |key, value|
+      value.each do |object|
+          self.accounts.each do |account|
+            if object[:account].id === account.id
+              sorted = account.holdings.sort_by{ |holding| holding.id}
+                sorted.each do |holding|
+                  if holding.symbol === "MM"
+                    value = holding.shares
+                  else
+                    symbol = holding.symbol
+                    price = @holding.get_price(symbol).to_f
+                    shares = holding.shares
+                    value = (price * shares).to_f
+                  end
+                  value = '%.2f' % [(value * 100).round / 100.0]
+                  object.values[1].push({:holding => holding, :transactions => holding.transactions, holding_by_dollars: value})
+            end
+          end
+        end
+      end
+    end
     return data
   end
 

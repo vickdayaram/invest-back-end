@@ -45,6 +45,7 @@ class User < ApplicationRecord
     total_contributions
   end
 
+
   def format_json
     data = {:accounts => []}
     #iterating through and constructing the object here
@@ -53,7 +54,7 @@ class User < ApplicationRecord
         value.push({:account => account, :holdings => []})
       end
     end
-
+    @holding = Holding.new
     #doing one more iteration and filling in the holdings and transactions
     data.each do |key, value|
       value.each do |object|
@@ -61,7 +62,16 @@ class User < ApplicationRecord
             if object[:account].id === account.id
               sorted = account.holdings.sort_by{ |holding| holding.id}
                 sorted.each do |holding|
-                  object.values[1].push({:holding => holding, :transactions => holding.transactions})
+                  if holding.symbol === "MM"
+                    value = holding.shares.to_i
+                  else
+                    symbol = holding.symbol
+                    price = @holding.get_price(symbol).to_f
+                    shares = holding.shares.to_i
+                    value = (price * shares).to_f
+                  end
+                  value = '%.2f' % [(value * 100).round / 100.0]
+                  object.values[1].push({:holding => holding, :transactions => holding.transactions, holding_by_dollars: value})
             end
           end
         end

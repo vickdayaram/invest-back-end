@@ -7,6 +7,7 @@ class Api::V1::UsersController < ApplicationController
 
   def create
     @user = User.new(user_params)
+    @user.create_account("Individual", 10000)
     if !!@user.save
       @user.save
       created_jwt = issue_token({id: @user.id})

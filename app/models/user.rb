@@ -230,7 +230,7 @@ class User < ApplicationRecord
         {holding: transaction.holding.symbol,
          type: type,
          price: transaction.execution_price,
-         date: transaction.created_at.strftime("%l:%M %P %b %d. %Y"),
+         date: transaction.created_at.strftime("%b %d. %Y"),
          shares: transaction.shares_executed})
       end
     end

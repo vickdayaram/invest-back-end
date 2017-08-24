@@ -1,7 +1,7 @@
 class User < ApplicationRecord
   has_secure_password
   validates :username, uniqueness: true, length: {:within => 4..12}, presence: true
-  validates :password, presence: true, length: {:within => 6..10}
+  validates :password, presence: true, length: {:within => 6..1024}
   has_many :accounts
   has_many :holdings, through: :accounts
   has_many :transactions, through: :holdings
@@ -230,7 +230,7 @@ class User < ApplicationRecord
         {holding: transaction.holding.symbol,
          type: type,
          price: transaction.execution_price,
-         date: transaction.created_at.strftime("%d %b. %Y  %H:%M"),
+         date: transaction.created_at.strftime("%l:%M %P %b %d. %Y"),
          shares: transaction.shares_executed})
       end
     end

@@ -226,11 +226,14 @@ class User < ApplicationRecord
         if transaction.buy === false
           type = "Sell"
         end
+        easterntime = ActiveSupport::TimeZone.find_tzinfo("America/New_York").utc_to_local(transaction.created_at)
+        date = easterntime.strftime("%b %d, %Y")
+        time = easterntime.strftime("%l:%M%P")
         transactions_by_account[key].push(
         {holding: transaction.holding.symbol,
          type: type,
          price: transaction.execution_price,
-         date: transaction.created_at.strftime("%b %d. %Y"),
+         date: date + " at " + time,
          shares: transaction.shares_executed})
       end
     end

@@ -120,8 +120,9 @@ class User < ApplicationRecord
                     shares = holding.shares
                     value = (price * shares).to_f
                   end
+                  sorted_transactions = holding.transactions.sort_by{ |transaction| transaction.id }
                   value = '%.2f' % [(value * 100).round / 100.0]
-                  account_object.values[1].push({:holding => holding, :transactions => holding.transactions, holding_by_dollars: value})
+                  account_object.values[1].push({:holding => holding, :transactions => sorted_transactions, holding_by_dollars: value})
             end
           end
         end

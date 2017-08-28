@@ -1,7 +1,7 @@
 class User < ApplicationRecord
   has_secure_password
   validates :username, uniqueness: true, length: {:within => 4..12}, presence: true
-  validates :password, presence: true, length: {:within => 6..10}
+  validates :password, presence: true, length: {:within => 6..1024}
   has_many :accounts
   has_many :holdings, through: :accounts
   has_many :transactions, through: :holdings
@@ -120,8 +120,9 @@ class User < ApplicationRecord
                     shares = holding.shares
                     value = (price * shares).to_f
                   end
+                  sorted_transactions = holding.transactions.sort_by{ |transaction| transaction.id }
                   value = '%.2f' % [(value * 100).round / 100.0]
-                  account_object.values[1].push({:holding => holding, :transactions => holding.transactions, holding_by_dollars: value})
+                  account_object.values[1].push({:holding => holding, :transactions => sorted_transactions, holding_by_dollars: value})
             end
           end
         end
@@ -220,17 +221,21 @@ class User < ApplicationRecord
       transactions_by_account[key] = []
     end
     self.accounts.each do |account|
-      account.transactions.each do |transaction|
+      sorted_transactions = account.transactions.sort_by{ |transaction| transaction.id}
+      sorted_transactions.each do |transaction|
         key = account.account_type + " " + account.account_number.to_s + "-" + account.id.to_s
         type = "Buy"
         if transaction.buy === false
           type = "Sell"
         end
+        easterntime = ActiveSupport::TimeZone.find_tzinfo("America/New_York").utc_to_local(transaction.created_at)
+        date = easterntime.strftime("%b %d, %Y")
+        time = easterntime.strftime("%l:%M%P")
         transactions_by_account[key].push(
         {holding: transaction.holding.symbol,
          type: type,
          price: transaction.execution_price,
-         date: transaction.created_at.strftime("%d %b. %Y  %H:%M"),
+         date: date + " at " + time,
          shares: transaction.shares_executed})
       end
     end

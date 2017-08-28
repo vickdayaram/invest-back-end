@@ -221,7 +221,8 @@ class User < ApplicationRecord
       transactions_by_account[key] = []
     end
     self.accounts.each do |account|
-      account.transactions.each do |transaction|
+      sorted_transactions = account.transactions.sort_by{ |transaction| transaction.id}
+      sorted_transactions.each do |transaction|
         key = account.account_type + " " + account.account_number.to_s + "-" + account.id.to_s
         type = "Buy"
         if transaction.buy === false

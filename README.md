@@ -1,7 +1,7 @@
 # Investment-Tracker
 
 ## Description
-Investment-Tracker is a web app that allows users to track their investments. Users can open up accounts, buy and sell a variety of stocks and ETFs, keep track of their transaction history, account holdings, and track their account performance over time. They can also view charted performance information for several securities, and US sector performance data.
+Investment-Tracker is a web app that allows users to track their investments. Users can open accounts, buy and sell a variety of stocks and ETFs, keep track of their transaction history, and track their account performance over time. They can also view charted performance information for several securities, and US sector performance data.
 
 Additionally users can fill out a short questionnaire and generate a retirement portfolio recommendation. If they are interested to see how that portfolio would do, they have the option to implement the portfolio and track it's performance over time as well. Users are not given trading access to these portfolios. They are meant to show the user how an index based approach can work over time.
 

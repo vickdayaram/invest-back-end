@@ -5,13 +5,13 @@ Investment-Tracker is a web app that allows users to track their investments. Us
 
 Additionally users can fill out a short questionnaire and generate a retirement portfolio recommendation. If they are interested to see how that portfolio would do, they have the option to implement the portfolio and track it's performance over time as well. Users are not given trading access to these portfolios. They are meant to show the user how an index based approach can work over time.
 
-## Getting Started
+## Demo
 
 Visit the website by clicking the link below:  https://investment-tracker.herokuapp.com/ to view a live version of Investment-Tracker.
 
 ## Built With
 
-###### Front-end
+#### Front-end
 * React, v15.6.1
 * Semantic-ui-react, v0.71.3
 * Format-Currency, v1.0.0
@@ -24,7 +24,7 @@ Visit the website by clicking the link below:  https://investment-tracker.heroku
 * Alpha-Vantage - API for market data.
 * Unsplash - API to generate random photos for the photo of the moment feature.
 
-###### Back-end
+#### Back-end
 * Ruby-On-Rails, v5.1.3
 * Ruby, v2.3.1
 * Postgres, 0.18
